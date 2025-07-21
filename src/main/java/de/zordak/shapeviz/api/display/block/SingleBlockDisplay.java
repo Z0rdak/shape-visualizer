@@ -17,7 +17,6 @@ public class SingleBlockDisplay implements BlockDisplayHandle {
     private final BlockDisplayProperties properties;
     private final BlockPos position;
     private final UUID uuid;
-    @Nullable
     private Display.BlockDisplay blockDisplay;
 
     public SingleBlockDisplay(Display.BlockDisplay display, UUID uuid, BlockPos pos, BlockDisplayProperties properties) {
@@ -55,8 +54,8 @@ public class SingleBlockDisplay implements BlockDisplayHandle {
         this.blockDisplay = blockDisplay;
     }
 
-    public Set<SingleBlockDisplay> getEntities() {
-        return Set.of(this);
+    public Set<Display.BlockDisplay> getEntities() {
+        return Set.of(this.blockDisplay);
     }
 
     public BlockDisplayProperties getProperties() {

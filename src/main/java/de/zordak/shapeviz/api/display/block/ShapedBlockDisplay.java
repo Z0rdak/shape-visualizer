@@ -41,6 +41,11 @@ public class ShapedBlockDisplay implements ShapedDisplayHandle {
     }
 
     @Override
+    public Set<Display.BlockDisplay> getEntities() {
+        return Set.of();
+    }
+
+    @Override
     public void updateGlow(boolean glowing) {
         this.activeEntities.keySet().forEach(style -> this.updateGlow(style, glowing));
     }

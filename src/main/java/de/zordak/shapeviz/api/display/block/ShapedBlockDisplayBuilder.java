@@ -18,7 +18,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static de.zordak.shapeviz.api.display.block.BlockDisplayUtil.DEFAULT_CUSTOM_DATA_KEY;
 
 public final class ShapedBlockDisplayBuilder {
 
@@ -28,7 +31,7 @@ public final class ShapedBlockDisplayBuilder {
     private ChatFormatting glowColor = ChatFormatting.WHITE;
     private int lightLevel = 15;
     private CompoundTag customData = new CompoundTag();
-    private String tagKey = ShapeVisualizer.MOD_ID + ":data";
+    private String tagKey = DEFAULT_CUSTOM_DATA_KEY;
     private ShapeStyle initialStyle = ShapeStyle.FRAME;
 
     public ShapedBlockDisplayBuilder(Shape shape) {
@@ -72,30 +75,21 @@ public final class ShapedBlockDisplayBuilder {
     }
 
     public ShapedBlockDisplay build(ServerLevel level) {
-        ShapeType<?> shapeType = shape.getType(); // Assuming your Shape has a .getType()
-
+        ShapeType<?> shapeType = shape.getType();
         DisplayStrategy strategy = shapeType.strategyFor(initialStyle);
         if (strategy == null) {
             throw new IllegalStateException("ShapeStyle " + initialStyle + " not supported for shape type: " + shapeType.id());
         }
         Set<BlockPos> relativePositions = strategy.getBlockPositions(shape);
 
-        Set<BlockDisplay> displays = relativePositions.stream().map(offset -> {
-            BlockPos pos = shape.origin().offset(offset);
-            Display.BlockDisplay entity = new Display.BlockDisplay(EntityType.BLOCK_DISPLAY, level);
-            BlockDisplay wrapper = new BlockDisplay(entity);
-            try {
-                BlockDisplayUtil.updateBlock(wrapper, blockState);
-                BlockDisplayUtil.updateGlow(wrapper, glowing);
-                BlockDisplayUtil.updateGlowColor(wrapper, glowColor);
-                BlockDisplayUtil.updateLightLevel(wrapper, lightLevel);
-                BlockDisplayUtil.setCustomData(wrapper, tagKey, customData);
-                BlockDisplayUtil.updatePos(wrapper, pos);
-            } catch (CommandSyntaxException e) {
-                throw new RuntimeException(e);
-            }
-            return wrapper;
-        }).collect(Collectors.toSet());
-        return new ShapedBlockDisplay(shape, initialStyle, displays);
+        BlockDisplayProperties properties = new BlockDisplayProperties(
+            blockState, glowing, glowColor, lightLevel, tagKey, customData
+        );
+
+        Set<Display.BlockDisplay> entities = relativePositions.stream()
+            .map(offset -> BlockDisplayUtil.createBlockDisplay(properties, shape.origin().offset(offset), level))
+            .collect(Collectors.toSet());
+        var uuid = UUID.randomUUID();
+        return new ShapedBlockDisplay(uuid, shape, initialStyle, entities, properties);
     }
 }

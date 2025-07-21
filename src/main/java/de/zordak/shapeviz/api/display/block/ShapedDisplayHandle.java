@@ -3,13 +3,14 @@ package de.zordak.shapeviz.api.display.block;
 import de.zordak.shapeviz.shape.Shape;
 import de.zordak.shapeviz.shape.ShapeStyle;
 import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Set;
 import java.util.UUID;
 
 public interface ShapedDisplayHandle extends BlockDisplayHandle {
-    Set<BlockDisplay> getEntities(ShapeStyle style);
+    Set<Display.BlockDisplay> getEntities(ShapeStyle style);
     Shape getShape();
     void updateBlock(ShapeStyle style, BlockState state);
     void updateGlow(ShapeStyle style, boolean glowing);

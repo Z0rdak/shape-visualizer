@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface DisplayHandle {
     UUID getId();
-    Set<BlockDisplay> getEntities();
+
     void updateGlow(boolean glowing);
     void updateGlowColor(ChatFormatting color);
     void updateLightLevel(int level);

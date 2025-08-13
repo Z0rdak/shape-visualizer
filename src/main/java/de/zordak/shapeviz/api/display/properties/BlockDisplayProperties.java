@@ -1,8 +1,8 @@
-package de.zordak.shapeviz.api.display.block;
+package de.zordak.shapeviz.api.display.properties;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import de.zordak.shapeviz.ShapeVisualizer;
+import de.zordak.shapeviz.api.display.block.BlockDisplayUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,8 +16,16 @@ public record BlockDisplayProperties(
     int lightLevel,
     String tagKey,
     CompoundTag customData
-) {
+) implements DisplayTypeProperties {
+
+    @Override
+    public String type() {
+        return "block";
+    }
+
+
     public static final Codec<BlockDisplayProperties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf("type").orElse("block").forGetter(BlockDisplayProperties::type),
         BlockState.CODEC.fieldOf("blockState")
                 .orElse(BlockDisplayUtil.randomFromDefault())
                 .forGetter(BlockDisplayProperties::blockState),
@@ -37,5 +45,7 @@ public record BlockDisplayProperties(
         CompoundTag.CODEC.fieldOf("customData")
                 .orElse(new CompoundTag())
                 .forGetter(BlockDisplayProperties::customData)
-    ).apply(instance, BlockDisplayProperties::new));
+    ).apply(instance, (type, blockState, glowing, glowColor, lightLevel, tagKey, customData) ->
+            new BlockDisplayProperties(blockState, glowing, glowColor, lightLevel, tagKey, customData)
+    ));
 }

@@ -1,8 +1,6 @@
-package de.zordak.shapeviz.api.display.text;
+package de.zordak.shapeviz.api.display.properties;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Display;
 
 public record TextDisplayProperties(
@@ -14,7 +12,12 @@ public record TextDisplayProperties(
         boolean seeThrough,
         boolean shadow,
         short opacity
-) {
+) implements DisplayTypeProperties {
+
+    @Override
+    public String type() {
+        return "text";
+    }
     public static final Codec<TextDisplayProperties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("text")
                     .orElse("<Your text here>")
@@ -39,6 +42,9 @@ public record TextDisplayProperties(
                     .forGetter(TextDisplayProperties::shadow),
             Codec.SHORT.fieldOf("opacity")
                     .orElse((short) -1)
-                    .forGetter(TextDisplayProperties::opacity)
-    ).apply(instance, TextDisplayProperties::new));
+                    .forGetter(TextDisplayProperties::opacity),
+            Codec.STRING.fieldOf("type").orElse("text").forGetter(p -> "block")
+    ).apply(instance, (text, alignment, background, defaultBackground, lineWidth, seeThrough, shadow, opacity, type) ->
+            new TextDisplayProperties(text, alignment, background, defaultBackground, lineWidth, seeThrough, shadow, opacity)
+    ));
 }

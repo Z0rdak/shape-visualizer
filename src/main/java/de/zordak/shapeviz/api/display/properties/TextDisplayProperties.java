@@ -1,6 +1,7 @@
 package de.zordak.shapeviz.api.display.properties;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import de.zordak.shapeviz.api.display.text.TextDisplayUtil;
 import net.minecraft.world.entity.Display;
 
 public record TextDisplayProperties(
@@ -19,28 +20,28 @@ public record TextDisplayProperties(
         return "text";
     }
     public static final Codec<TextDisplayProperties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("text")
+            Codec.STRING.fieldOf(TextDisplayUtil.TAG_TEXT)
                     .orElse("<Your text here>")
                     .forGetter(TextDisplayProperties::text),
-            Display.TextDisplay.Align.CODEC.fieldOf("alignment")
+            Display.TextDisplay.Align.CODEC.fieldOf(TextDisplayUtil.TAG_ALIGNMENT)
                     .orElse(Display.TextDisplay.Align.CENTER)
                     .forGetter(TextDisplayProperties::alignment),
-            Codec.INT.fieldOf("background")
+            Codec.INT.fieldOf(TextDisplayUtil.TAG_BACKGROUND)
                     .orElse(Display.TextDisplay.INITIAL_BACKGROUND)
                     .forGetter(TextDisplayProperties::background),
-            Codec.BOOL.fieldOf("defaultBackground")
+            Codec.BOOL.fieldOf(TextDisplayUtil.TAG_DEFAULT_BACKGROUND)
                     .orElse(false)
                     .forGetter(TextDisplayProperties::defaultBackground),
-            Codec.SHORT.fieldOf("lineWidth")
+            Codec.SHORT.fieldOf(TextDisplayUtil.TAG_LINE_WIDTH)
                     .orElse((short) 200)
                     .forGetter(TextDisplayProperties::lineWidth),
-            Codec.BOOL.fieldOf("seeThrough")
+            Codec.BOOL.fieldOf(TextDisplayUtil.TAG_SEE_THROUGH)
                     .orElse(false)
                     .forGetter(TextDisplayProperties::seeThrough),
-            Codec.BOOL.fieldOf("shadow")
+            Codec.BOOL.fieldOf(TextDisplayUtil.TAG_SHADOW)
                     .orElse(false)
                     .forGetter(TextDisplayProperties::shadow),
-            Codec.SHORT.fieldOf("opacity")
+            Codec.SHORT.fieldOf(TextDisplayUtil.TAG_OPACITY)
                     .orElse((short) -1)
                     .forGetter(TextDisplayProperties::opacity),
             Codec.STRING.fieldOf("type").orElse("text").forGetter(p -> "block")

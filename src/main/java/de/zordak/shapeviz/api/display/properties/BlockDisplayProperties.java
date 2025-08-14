@@ -3,17 +3,12 @@ package de.zordak.shapeviz.api.display.properties;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.zordak.shapeviz.api.display.block.BlockDisplayUtil;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
-import static de.zordak.shapeviz.api.display.block.BlockDisplayUtil.DEFAULT_CUSTOM_DATA_KEY;
 
 public record BlockDisplayProperties(
     BlockState blockState,
-    boolean glowing,
-    ChatFormatting glowColor,
-    int lightLevel,
     String tagKey,
     CompoundTag customData
 ) implements DisplayTypeProperties {
@@ -23,29 +18,20 @@ public record BlockDisplayProperties(
         return "block";
     }
 
+    public static final String TAG_BLOCK_STATE = "block_state";
 
     public static final Codec<BlockDisplayProperties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("type").orElse("block").forGetter(BlockDisplayProperties::type),
-        BlockState.CODEC.fieldOf("blockState")
-                .orElse(BlockDisplayUtil.randomFromDefault())
-                .forGetter(BlockDisplayProperties::blockState),
-        Codec.BOOL.fieldOf("glowing")
-                .orElse(false)
-                .forGetter(BlockDisplayProperties::glowing),
-        Codec.STRING.xmap(ChatFormatting::getByName, ChatFormatting::name)
-                .fieldOf("glowColor")
-                .orElse(ChatFormatting.WHITE)
-                .forGetter(p -> ChatFormatting.getByName(p.glowColor().name())),
-        Codec.INT.fieldOf("lightLevel")
-                .orElse(15)
-                .forGetter(BlockDisplayProperties::lightLevel),
-        Codec.STRING.fieldOf("tagKey")
-                .orElse(DEFAULT_CUSTOM_DATA_KEY)
-                .forGetter(BlockDisplayProperties::tagKey),
-        CompoundTag.CODEC.fieldOf("customData")
-                .orElse(new CompoundTag())
-                .forGetter(BlockDisplayProperties::customData)
-    ).apply(instance, (type, blockState, glowing, glowColor, lightLevel, tagKey, customData) ->
-            new BlockDisplayProperties(blockState, glowing, glowColor, lightLevel, tagKey, customData)
+        BlockState.CODEC.fieldOf(TAG_BLOCK_STATE)
+                    .orElse(BlockDisplayUtil.randomFromDefault())
+                    .forGetter(BlockDisplayProperties::blockState),
+            Codec.STRING.fieldOf("tagKey")
+                    .orElse(DisplayEntityUtils.TAG_DEFAULT_CUSTOM_DATA)
+                    .forGetter(BlockDisplayProperties::tagKey),
+            CompoundTag.CODEC.fieldOf("customData")
+                    .orElse(new CompoundTag())
+                    .forGetter(BlockDisplayProperties::customData),
+            Codec.STRING.fieldOf("type").orElse("block").forGetter(BlockDisplayProperties::type)
+            ).apply(instance, (blockState, tagKey, customData, type) ->
+            new BlockDisplayProperties(blockState, tagKey, customData)
     ));
 }
